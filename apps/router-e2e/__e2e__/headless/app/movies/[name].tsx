@@ -8,7 +8,7 @@ export default function Movie() {
   const title = name.toString();
 
   return (
-    <View style={styles.root}>
+    <View style={styles.root} testID="tab-movie-detail">
       <Stack.Screen options={{ title }} />
       <Text style={styles.header}>{name}</Text>
       <View style={styles.listRoot}>
