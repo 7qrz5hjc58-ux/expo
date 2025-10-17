@@ -3,7 +3,8 @@ import React from 'react';
 import { AppState } from 'react-native';
 
 import { getBaseURL } from './base';
-import type { BridgeMessage, DOMProps, WebViewProps, WebViewRef } from './dom.types';
+import { DOMPropsInternal } from './dom-internal.types';
+import type { BridgeMessage, WebViewProps, WebViewRef } from './dom.types';
 import { _emitGlobalEvent } from './global-events';
 import {
   getInjectBodySizeObserverScript,
@@ -22,7 +23,7 @@ type RawWebViewProps = React.ComponentProps<Exclude<typeof ExpoDomWebView, undef
 
 interface Props {
   children?: any;
-  dom?: DOMProps;
+  dom?: DOMPropsInternal;
   filePath: string;
   ref: React.Ref<object>;
   [propName: string]: unknown;
@@ -129,6 +130,7 @@ const RawWebView = React.forwardRef<object, Props>((props, ref) => {
         subscription.remove();
       });
     },
+    source,
     ...dom,
     containerStyle: [containerStyle, debugZeroHeightStyle, dom?.containerStyle],
     onLayout: __DEV__ ? debugOnLayout : dom?.onLayout,
@@ -143,7 +145,6 @@ const RawWebView = React.forwardRef<object, Props>((props, ref) => {
       .join('\n'),
     // @ts-expect-error: TODO(@kitten): untyped ref for now
     ref: webviewRef,
-    source,
     style: [
       dom?.style ? { flex: 1, backgroundColor: 'transparent' } : { backgroundColor: 'transparent' },
       dom?.style,
