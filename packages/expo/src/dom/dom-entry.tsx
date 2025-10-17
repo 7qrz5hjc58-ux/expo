@@ -1,7 +1,6 @@
 // Entry file for a DOM Component.
 import '@expo/metro-runtime';
 
-import { setupLogBox } from '@expo/log-box';
 import React from 'react';
 
 import { JSONValue } from './dom.types';
@@ -103,7 +102,7 @@ export function registerDOMComponent(AppModule: any) {
 
   try {
     if (process.env.NODE_ENV !== 'production') {
-      setupLogBox();
+      require('@expo/log-box').setupLogBox();
     }
 
     React.startTransition(() => {

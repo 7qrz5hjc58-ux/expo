@@ -1,4 +1,3 @@
-import { setupLogBox } from '@expo/log-box';
 import { registerRootComponent } from 'expo';
 import * as React from 'react';
 import { View } from 'react-native';
@@ -54,7 +53,7 @@ function convertError(error: any) {
 export function renderRootComponent(Component: React.ComponentType<any>) {
   try {
     if (process.env.NODE_ENV !== 'production') {
-      setupLogBox();
+      require('@expo/log-box').setupLogBox();
     }
 
     // This must be delayed so the user has a chance to call it first.
