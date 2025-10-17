@@ -28,6 +28,7 @@
       "favicon": "./assets/favicon.png"
     },
     "experiments": {
+      "autolinkingModuleResolution": true,
       "baseUrl": "."
     }
   }
