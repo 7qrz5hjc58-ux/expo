@@ -1,31 +1,9 @@
 {
   "expo": {
-    "name": "ExpoLogBoxDemo2",
-    "slug": "ExpoLogBoxDemo2",
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
-    "newArchEnabled": true,
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
-    "ios": {
-      "supportsTablet": true
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
-    },
+    "name": "ExpoLogBox",
+    "slug": "expo-log-box",
     "web": {
-      "output": "single",
-      "favicon": "./assets/favicon.png"
+      "output": "single"
     },
     "experiments": {
       "autolinkingModuleResolution": true,
