@@ -19,7 +19,7 @@
 
 - [android] Add getDefaultReactHost to ExpoReactHostFactory ([#40086](https://github.com/expo/expo/pull/40086) by [@gabrieldonadel](https://github.com/gabrieldonadel))
 - [Android] Remove edge-to-edge logic from `ReactActivityDelegateWrapper`. ([#40263](https://github.com/expo/expo/pull/40263) by [@behenate](https://github.com/behenate))
-- [internal] Add `source` to `DOMPropsInternal` to enable pre-bundled DOM Components. ([#40397](https://github.com/expo/expo/pull/40397) by [@krystofwoldrich](https://github.com/krystofwoldrich))
+- [expo/dom] Add `source` to `DOMProps` to enable pre-bundled DOM Components. ([#40397](https://github.com/expo/expo/pull/40397) by [@krystofwoldrich](https://github.com/krystofwoldrich))
 
 ### ⚠️ Notices
 

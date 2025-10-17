@@ -3,8 +3,7 @@ import React from 'react';
 import { AppState } from 'react-native';
 
 import { getBaseURL } from './base';
-import { DOMPropsInternal } from './dom-internal.types';
-import type { BridgeMessage, WebViewProps, WebViewRef } from './dom.types';
+import type { BridgeMessage, WebViewProps, WebViewRef, DOMProps } from './dom.types';
 import { _emitGlobalEvent } from './global-events';
 import {
   getInjectBodySizeObserverScript,
@@ -23,7 +22,7 @@ type RawWebViewProps = React.ComponentProps<Exclude<typeof ExpoDomWebView, undef
 
 interface Props {
   children?: any;
-  dom?: DOMPropsInternal;
+  dom?: DOMProps;
   filePath: string;
   ref: React.Ref<object>;
   [propName: string]: unknown;
