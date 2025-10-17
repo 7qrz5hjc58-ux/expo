@@ -51,6 +51,26 @@ export type WarningInfo = {
 
 export type WarningFilter = (format: string) => WarningInfo;
 
+let warningFilter: WarningFilter = function (format) {
+  return {
+    finalFormat: format,
+    forceDialogImmediately: false,
+    suppressDialog_LEGACY: false,
+    suppressCompletely: false,
+    monitorEvent: 'warning_unhandled',
+    monitorListVersion: 0,
+    monitorSampleRate: 1,
+  };
+};
+
+export function setWarningFilter(filter: WarningFilter): void {
+  warningFilter = filter;
+}
+
+export function checkWarningFilter(format: string): WarningInfo {
+  return warningFilter(format);
+}
+
 type Props = object;
 
 type State = {
@@ -274,13 +294,15 @@ export function setSelectedLog(proposedNewIndex: number): void {
   _selectedIndex = newIndex;
   handleUpdate();
 
-  setTimeout(() => {
-    if (oldIndex < 0 && newIndex >= 0) {
-      require('../ErrorOverlayWebControls').presentGlobalErrorOverlay();
-    } else if (oldIndex >= 0 && newIndex < 0) {
-      require('../ErrorOverlayWebControls').dismissGlobalErrorOverlay();
-    }
-  }, 0);
+  if (process.env.EXPO_OS === 'web') {
+    setTimeout(() => {
+      if (oldIndex < 0 && newIndex >= 0) {
+        require('../ErrorOverlayWebControls').presentGlobalErrorOverlay();
+      } else if (oldIndex >= 0 && newIndex < 0) {
+        require('../ErrorOverlayWebControls').dismissGlobalErrorOverlay();
+      }
+    }, 0);
+  }
 }
 
 export function clearErrors(): void {

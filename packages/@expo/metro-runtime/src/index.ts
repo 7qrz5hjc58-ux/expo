@@ -18,4 +18,11 @@ if (__DEV__) {
 
   // @ts-expect-error: TODO: Remove this when we remove the log box.
   globalThis.__expo_dev_resetErrors = require('@expo/log-box/src/LogBox').default.clearAllLogs;
+
+  // Path the parser function to align the parsing with the web
+  // We could also replace the entire module but this is less invasive
+  // and easier to maintain due to the large number of exports in this module.
+  const LogBoxParserModule = require('react-native/Libraries/LogBox/Data/parseLogBoxLog');
+  const { parseLogBoxLog } = require('@expo/log-box/parser');
+  LogBoxParserModule.parseLogBoxLog = parseLogBoxLog;
 }

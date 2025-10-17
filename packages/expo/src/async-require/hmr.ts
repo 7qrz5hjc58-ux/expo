@@ -11,18 +11,14 @@
 import { parseWebHmrBuildErrors, type MetroBuildError } from '@expo/log-box/utils';
 import MetroHMRClient from '@expo/metro/metro-runtime/modules/HMRClient';
 import prettyFormat, { plugins } from 'pretty-format';
-import { DeviceEventEmitter } from 'react-native';
 
-// Ensure events are sent so custom Fast Refresh views are shown.
-function showLoading(message: string, _type: 'load' | 'refresh') {
-  DeviceEventEmitter.emit('devLoadingView:showMessage', {
-    message,
-  });
-}
-
-function hideLoading() {
-  DeviceEventEmitter.emit('devLoadingView:hide', {});
-}
+import {
+  getConnectionError,
+  getFullBundlerUrl,
+  hideLoading,
+  resetErrorOverlay,
+  showLoading,
+} from './hmrUtils';
 
 const pendingEntryPoints: string[] = [];
 
@@ -112,12 +108,18 @@ const HMRClient = {
       return;
     }
     try {
+      const webMetadata =
+        process.env.EXPO_OS === 'web'
+          ? {
+              platform: 'web',
+              mode: 'BRIDGE',
+            }
+          : undefined;
       hmrClient.send(
         JSON.stringify({
+          ...webMetadata,
           type: 'log',
           level,
-          platform: 'web',
-          mode: 'BRIDGE',
           data: data.map((item) =>
             typeof item === 'string'
               ? item
@@ -139,44 +141,59 @@ const HMRClient = {
 
   // Called once by the bridge on startup, even if Fast Refresh is off.
   // It creates the HMR client but doesn't actually set up the socket yet.
-  setup({ isEnabled }: { isEnabled: boolean }) {
-    assert(!hmrClient, 'Cannot initialize hmrClient twice');
+  setup(
+    platformOrOptions: string | { isEnabled: boolean },
+    bundleEntry?: string,
+    host?: string,
+    port?: number | string,
+    isEnabledOrUndefined?: boolean,
+    scheme: string = 'http'
+  ) {
+    let isEnabled = !!isEnabledOrUndefined;
+    let serverScheme: string;
+    let serverHost: string;
 
-    const serverScheme = window.location.protocol === 'https:' ? 'wss' : 'ws';
-    const client = new MetroHMRClient(`${serverScheme}://${window.location.host}/hot`);
+    if (process.env.EXPO_OS === 'web') {
+      assert(
+        platformOrOptions && typeof platformOrOptions === 'object',
+        'Expected platformOrOptions to be an options object on web.'
+      );
+      assert(!hmrClient, 'Cannot initialize hmrClient twice');
+      isEnabled = platformOrOptions.isEnabled;
+
+      serverScheme = window.location.protocol === 'https:' ? 'wss' : 'ws';
+      serverHost = window.location.host;
+    } else {
+      assert(
+        platformOrOptions && typeof platformOrOptions === 'string',
+        'Missing required parameter `platform`'
+      );
+      assert(bundleEntry, 'Missing required parameter `bundleEntry`');
+      assert(host, 'Missing required parameter `host`');
+      assert(!hmrClient, 'Cannot initialize hmrClient twice');
+
+      serverHost = port !== null && port !== '' ? `${host}:${port}` : host;
+      serverScheme = scheme;
+    }
+
+    const origin = `${serverScheme}://${serverHost}`;
+    const client = new MetroHMRClient(`${origin}/hot`);
     hmrClient = client;
-
-    const fullBundleUrl = (() => {
-      if (document?.currentScript && 'src' in document.currentScript) {
-        return document.currentScript.src;
-      }
-
-      const bundleUrl = new URL(location.href);
-
-      bundleUrl.searchParams.set('platform', process.env.EXPO_OS ?? 'web');
-
-      return bundleUrl.toString();
-    })();
 
     pendingEntryPoints.push(
       // HMRServer understands regular bundle URLs, so prefer that in case
       // there are any important URL parameters we can't reconstruct from
       // `setup()`'s arguments.
-      fullBundleUrl
+      getFullBundlerUrl({
+        serverScheme,
+        serverHost,
+        bundleEntry,
+        platform: typeof platformOrOptions === 'string' ? platformOrOptions : undefined,
+      })
     );
 
     client.on('connection-error', (e: Error) => {
-      let error = `Cannot connect to Expo CLI.
- 
- Try the following to fix the issue:
- - Ensure the Expo dev server is running and available on the same network as this device`;
-      error += `
- 
- URL: ${window.location.host}
- 
- Error: ${e.message}`;
-
-      setHMRUnavailableReason(error);
+      setHMRUnavailableReason(getConnectionError(serverHost, e));
     });
 
     client.on('update-start', ({ isInitialUpdate }: { isInitialUpdate?: boolean }) => {
@@ -190,11 +207,7 @@ const HMRClient = {
 
     client.on('update', ({ isInitialUpdate }: { isInitialUpdate?: boolean }) => {
       if (client.isEnabled() && !isInitialUpdate) {
-        // dismissRedbox();
-        // @ts-expect-error
-        globalThis.__expo_dev_resetErrors?.();
-        // LogBox.clearAllLogs();
-        // dismissGlobalErrorOverlay();
+        resetErrorOverlay();
       }
     });
 
@@ -331,7 +344,25 @@ function showCompileError() {
 
   const error = buildErrorQueue.values().next().value;
   buildErrorQueue.clear();
-  throw error;
+  if (!error) {
+    return;
+  }
+
+  if (process.env.EXPO_OS === 'web') {
+    throw error;
+  } else {
+    const LogBox = require('react-native/Libraries/LogBox/LogBox').default;
+    LogBox.addException({
+      message: error.ansiError,
+      originalMessage: error.ansiError,
+      name: undefined,
+      componentStack: undefined,
+      stack: [],
+      id: -1,
+      isFatal: true,
+      isComponentError: false,
+    });
+  }
 }
 
 export default HMRClient;

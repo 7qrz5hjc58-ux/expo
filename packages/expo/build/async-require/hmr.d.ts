@@ -8,9 +8,9 @@ declare const HMRClient: {
     disable(): void;
     registerBundle(requestUrl: string): void;
     log(level: LogLevel, data: any[]): void;
-    setup({ isEnabled }: {
+    setup(platformOrOptions: string | {
         isEnabled: boolean;
-    }): void;
+    }, bundleEntry?: string, host?: string, port?: number | string, isEnabledOrUndefined?: boolean, scheme?: string): void;
     _onMetroError(data: unknown): void;
 };
 export default HMRClient;

@@ -14,12 +14,15 @@ exports.parseInterpolation = parseInterpolation;
 exports.parseLogBoxException = parseLogBoxException;
 exports.isError = isError;
 exports.parseLogBoxLog = parseLogBoxLog;
+exports.parseComponentStack = parseComponentStack;
 const react_1 = __importDefault(require("react"));
 const parseErrorStack_1 = require("../utils/parseErrorStack");
 const BABEL_TRANSFORM_ERROR_FORMAT = /^(?:TransformError )?(?:SyntaxError: |ReferenceError: )(.*): (.*) \((\d+):(\d+)\)\n\n([\s\S]+)/;
 const BABEL_CODE_FRAME_ERROR_FORMAT = /^(?:TransformError )?(?:.*):? (?:.*?)([/|\\].*): ([\s\S]+?)\n([ >]{2}[\d\s]+ \|[\s\S]+|\u{001b}[\s\S]+)/u;
 const METRO_ERROR_FORMAT = /^(?:(?:InternalError )?Metro has encountered an error:) (.*): (.*) \((\d+):(\d+)\)\n\n([\s\S]+)/u;
 const SUBSTITUTION = '\ufeff%s';
+// https://github.com/krystofwoldrich/react-native/blob/7db31e2fca0f828aa6bf489ae6dc4adef9b7b7c3/packages/react-native/Libraries/LogBox/Data/parseLogBoxLog.js#L130
+// In RN the original is not used outside of this file.
 // TODO: Get rid of this. The substitution logic is wild.
 function parseInterpolation(args) {
     const categoryParts = [];
@@ -341,6 +344,26 @@ function parseLogBoxLog(args) {
             content: message,
             substitutions: [],
         },
+    };
+}
+/**
+ * Not used in Expo code, but required for matching exports with upstream.
+ * https://github.com/krystofwoldrich/react-native/blob/7db31e2fca0f828aa6bf489ae6dc4adef9b7b7c3/packages/react-native/Libraries/LogBox/Data/parseLogBoxLog.js#L220
+ */
+function parseComponentStack(message) {
+    // We removed legacy parsing since we are in control of the React version used.
+    const stack = (0, parseErrorStack_1.parseErrorStack)(message);
+    return {
+        type: 'stack',
+        stack: stack.map((frame) => ({
+            content: frame.methodName,
+            collapse: frame.collapse || false,
+            fileName: frame.file == null ? 'unknown' : frame.file,
+            location: {
+                column: frame.column == null ? -1 : frame.column,
+                row: frame.lineNumber == null ? -1 : frame.lineNumber,
+            },
+        })),
     };
 }
 /**

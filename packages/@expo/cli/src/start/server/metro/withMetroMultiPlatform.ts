@@ -707,6 +707,18 @@ export function withExtendedResolver(
           }
         }
 
+        if (normal.endsWith('react-native/Libraries/Utilities/HMRClient.js')) {
+          try {
+            const hmrModule = doResolve('expo/src/async-require/hmr.ts');
+            if (hmrModule.type === 'sourceFile') {
+              debug('Using `expo/src/async-require/hmr.ts` implementation.');
+              return hmrModule;
+            }
+          } catch {
+            // Fallback to the default RN implementation.
+          }
+        }
+
         if (normal.endsWith('react-native/Libraries/LogBox/LogBoxInspectorContainer.js')) {
           if (env.EXPO_UNSTABLE_LOG_BOX) {
             try {
@@ -718,8 +730,9 @@ export function withExtendedResolver(
             } catch {
               // Fallback to the default LogBox implementation.
             }
+          } else {
+            debug('Using React Native LogBox implementation.');
           }
-          debug('Using React Native LogBox implementation.');
         }
       }
 
