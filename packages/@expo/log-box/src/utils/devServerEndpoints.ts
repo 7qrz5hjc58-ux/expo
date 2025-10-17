@@ -36,25 +36,6 @@ export function getBaseUrl() {
   return window.location.protocol + '//' + window.location.host;
 }
 
-export function installPackageInProject(pkg: string): void {
-  const url = new URL('/_expo/install-pkg', getBaseUrl()).href;
-
-  // @ts-ignore
-  if (globalThis.__polyfill_dom_fetchAsync) {
-    // @ts-ignore
-    globalThis.__polyfill_dom_fetchAsync(url, {
-      method: 'POST',
-      body: JSON.stringify({ pkg }),
-    });
-    return;
-  }
-
-  fetch(url, {
-    method: 'POST',
-    body: JSON.stringify({ pkg }),
-  });
-}
-
 export function openFileInEditor(file: string, lineNumber: number): void {
   const url = new URL('/open-stack-frame', getBaseUrl()).href;
 

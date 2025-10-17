@@ -83,7 +83,6 @@ import { DevToolsPluginMiddleware } from '../middleware/DevToolsPluginMiddleware
 import { createDomComponentsMiddleware } from '../middleware/DomComponentsMiddleware';
 import { FaviconMiddleware } from '../middleware/FaviconMiddleware';
 import { HistoryFallbackMiddleware } from '../middleware/HistoryFallbackMiddleware';
-import { InstallDevPackageMiddleware } from '../middleware/InstallDevPackageMiddleware';
 import { InterstitialPageMiddleware } from '../middleware/InterstitialPageMiddleware';
 import { resolveMainModuleName } from '../middleware/ManifestMiddleware';
 import { RuntimeRedirectMiddleware } from '../middleware/RuntimeRedirectMiddleware';
@@ -1137,11 +1136,10 @@ export class MetroBundlerDevServer extends BundlerDevServer {
 
       // TODO: Disable both of these when tunneling to prevent security issues
       middleware.use(new CreateFileMiddleware(this.projectRoot).getHandler());
-      // TODO: Disable both of these when tunneling to prevent security issues
-      middleware.use(new InstallDevPackageMiddleware(this.projectRoot).getHandler());
 
       // For providing info to the error overlay.
       middleware.use((req: ServerRequest, res: ServerResponse, next: ServerNext) => {
+        // Use by `@expo/log-box` https://github.com/expo/expo/blob/f29b9f3715e42dca87bf3eebf11f7e7dd1ff73c1/packages/%40expo/log-box/src/utils/devServerEndpoints.ts#L82
         if (req.url?.startsWith('/_expo/error-overlay-meta')) {
           res.statusCode = 200;
           res.setHeader('Content-Type', 'application/json');

@@ -12,7 +12,6 @@ import styles from './CodeFrame.module.css';
 import type { CodeFrame as CodeFrameData } from '../Data/Types';
 import {
   formatProjectFilePath,
-  installPackageInProject,
   openFileInEditor,
 } from '../utils/devServerEndpoints';
 
@@ -74,23 +73,22 @@ export function Terminal({ content, moduleName }: { content?: string; moduleName
   return (
     <CodeFrame
       title="Terminal"
-      headerAction={
-        <button
-          className={styles.copyButton}
-          type="button"
-          title="Run command in project"
-          onClick={() => {
-            // TODO: Stream back progress
-            installPackageInProject(moduleName);
-          }}
-          aria-label="Copy content">
-          <p className={styles.copyButtonText} data-text="true">
-            Run
-          </p>
+      // TODO: change to copy button
+      // headerAction={
+      //   <button
+      //     className={styles.copyButton}
+      //     type="button"
+      //     title="Run command in project"
+      //     onClick={() => {
+      //     }}
+      //     aria-label="Copy content">
+      //     <p className={styles.copyButtonText} data-text="true">
+      //       Run
+      //     </p>
 
-          <PlayIcon className={styles.copyButtonIcon} width={26} height={26} />
-        </button>
-      }
+      //     <PlayIcon className={styles.copyButtonIcon} width={26} height={26} />
+      //   </button>
+      // }
       headerIcon={<TerminalIcon />}
       content={content}
     />
