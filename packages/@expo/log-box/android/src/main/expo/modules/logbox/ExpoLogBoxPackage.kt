@@ -9,7 +9,7 @@ import expo.modules.core.interfaces.ReactActivityLifecycleListener
 
 class ExpoLogBoxPackage : Package {
   override fun createReactActivityLifecycleListeners(activityContext: Context?): List<ReactActivityLifecycleListener> {
-    if (!BuildConfig.DEBUG) {
+    if (!BuildConfig.DEBUG || !BuildConfig.EXPO_UNSTABLE_LOG_BOX) {
       return emptyList()
     }
 
