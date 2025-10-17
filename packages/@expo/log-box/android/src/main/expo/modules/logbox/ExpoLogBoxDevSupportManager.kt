@@ -1,11 +1,14 @@
 /*
+ * Copyright © 2024 650 Industries.
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
+ *
+ * https://github.com/krystofwoldrich/react-native/blob/7db31e2fca0f828aa6bf489ae6dc4adef9b7b7c3/packages/react-native/ReactAndroid/src/main/java/com/facebook/react/devsupport/BridgelessDevSupportManager.kt
  */
 
-package expo.modules
+package expo.modules.logbox
 
 import android.content.Context
 import com.facebook.react.bridge.ReadableArray
@@ -20,59 +23,11 @@ import com.facebook.react.devsupport.interfaces.DevSupportManager
 import com.facebook.react.devsupport.interfaces.PausedInDebuggerOverlayManager
 import com.facebook.react.devsupport.interfaces.RedBoxHandler
 import com.facebook.react.packagerconnection.RequestHandler
-import expo.modules.logbox.ExpoLogBoxSurfaceDelegate
 import com.facebook.react.devsupport.StackTraceHelper.convertJavaStackTrace
 import com.facebook.react.devsupport.StackTraceHelper.convertJsStackTrace
 import com.facebook.react.devsupport.interfaces.StackFrame
 
-/**
- * An implementation of [DevSupportManager] that extends the functionality in
- * [DevSupportManagerBase] with some additional, more flexible APIs for asynchronously loading the
- * JS bundle.
- *
- * @constructor The primary constructor mirrors the same constructor we have for
- *   [BridgeDevSupportManager] and
- *     * is kept for backward compatibility.
- */
-internal open class ExpoBridgelessDevSupportManager(
-  applicationContext: Context,
-  reactInstanceManagerHelper: ReactInstanceDevHelper,
-  packagerPathForJSBundleName: String?,
-  enableOnCreate: Boolean,
-  redBoxHandler: RedBoxHandler?,
-  devBundleDownloadListener: DevBundleDownloadListener?,
-  minNumShakes: Int,
-  customPackagerCommandHandlers: Map<String, RequestHandler>?,
-  surfaceDelegateFactory: SurfaceDelegateFactory?,
-  devLoadingViewManager: DevLoadingViewManager?,
-  pausedInDebuggerOverlayManager: PausedInDebuggerOverlayManager?
-) :
-  DevSupportManagerBase(
-    applicationContext,
-    reactInstanceManagerHelper,
-    packagerPathForJSBundleName,
-    enableOnCreate,
-    redBoxHandler,
-    devBundleDownloadListener,
-    minNumShakes,
-    customPackagerCommandHandlers,
-    surfaceDelegateFactory,
-    devLoadingViewManager,
-    pausedInDebuggerOverlayManager
-  ) {
-
-  override val uniqueTag: String
-    get() = "Bridgeless"
-
-  override fun handleReloadJS() {
-    UiThreadUtil.assertOnUiThread()
-    // dismiss redbox if exists
-    hideRedboxDialog()
-    reactInstanceDevHelper.reload("BridgelessDevSupportManager.handleReloadJS()")
-  }
-}
-
-internal class ExpoDevSupportManagerWithLogBoxOverride(
+class ExpoLogBoxDevSupportManager(
   applicationContext: Context,
   reactInstanceManagerHelper: ReactInstanceDevHelper,
   packagerPathForJSBundleName: String?,
@@ -121,7 +76,7 @@ internal class ExpoDevSupportManagerWithLogBoxOverride(
       if (redBoxSurfaceDelegate == null) {
         this.redBoxSurfaceDelegate =
           createSurfaceDelegate("RedBox")
-            ?: ExpoLogBoxSurfaceDelegate(this@ExpoDevSupportManagerWithLogBoxOverride).apply {
+            ?: ExpoLogBoxSurfaceDelegate(this@ExpoLogBoxDevSupportManager).apply {
               createContentView("RedBox")
             }
       }
@@ -133,5 +88,54 @@ internal class ExpoDevSupportManagerWithLogBoxOverride(
       }
       redBoxSurfaceDelegate?.show()
     }
+  }
+}
+
+/**
+ * [Source](https://github.com/krystofwoldrich/react-native/blob/7db31e2fca0f828aa6bf489ae6dc4adef9b7b7c3/packages/react-native/ReactAndroid/src/main/java/com/facebook/react/devsupport/BridgelessDevSupportManager.kt#L29)
+ *
+ * An implementation of [DevSupportManager] that extends the functionality in
+ * [DevSupportManagerBase] with some additional, more flexible APIs for asynchronously loading the
+ * JS bundle.
+ *
+ * @constructor The primary constructor mirrors the same constructor we have for
+ *   [BridgeDevSupportManager] and
+ *     * is kept for backward compatibility.
+ */
+open class ExpoBridgelessDevSupportManager(
+  applicationContext: Context,
+  reactInstanceManagerHelper: ReactInstanceDevHelper,
+  packagerPathForJSBundleName: String?,
+  enableOnCreate: Boolean,
+  redBoxHandler: RedBoxHandler?,
+  devBundleDownloadListener: DevBundleDownloadListener?,
+  minNumShakes: Int,
+  customPackagerCommandHandlers: Map<String, RequestHandler>?,
+  surfaceDelegateFactory: SurfaceDelegateFactory?,
+  devLoadingViewManager: DevLoadingViewManager?,
+  pausedInDebuggerOverlayManager: PausedInDebuggerOverlayManager?
+) :
+  DevSupportManagerBase(
+    applicationContext,
+    reactInstanceManagerHelper,
+    packagerPathForJSBundleName,
+    enableOnCreate,
+    redBoxHandler,
+    devBundleDownloadListener,
+    minNumShakes,
+    customPackagerCommandHandlers,
+    surfaceDelegateFactory,
+    devLoadingViewManager,
+    pausedInDebuggerOverlayManager
+  ) {
+
+  override val uniqueTag: String
+    get() = "Bridgeless"
+
+  override fun handleReloadJS() {
+    UiThreadUtil.assertOnUiThread()
+    // dismiss RedBox if it exists
+    hideRedboxDialog()
+    reactInstanceDevHelper.reload("BridgelessDevSupportManager.handleReloadJS()")
   }
 }
