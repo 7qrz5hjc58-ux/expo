@@ -1,12 +1,12 @@
 import LogBoxInspectorContainer from '@expo/log-box/src/logbox-web-polyfill';
-import { AppRegistry, Platform } from 'react-native';
+import { AppRegistry } from 'react-native';
 
 registerRootComponentInShadowDOM(LogBoxInspectorContainer);
 
 function registerRootComponentInShadowDOM(component) {
   AppRegistry.registerComponent('main', () => component);
 
-  if (Platform.OS !== 'web' || !window) {
+  if (process.env.EXPO_OS !== 'web' || !window) {
     console.error('expo-router/_error can be rendered only on Web.');
     return;
   }
