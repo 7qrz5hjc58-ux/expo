@@ -1,4 +1,4 @@
-#if !TARGET_OS_MACCATALYST
+#if EXPO_UNSTABLE_LOG_BOX
 
 #import <objc/runtime.h>
 #import <React/RCTRedBox.h>

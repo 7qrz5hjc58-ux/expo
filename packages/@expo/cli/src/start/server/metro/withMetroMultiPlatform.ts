@@ -34,12 +34,14 @@ import { withMetroSupervisingTransformWorker } from './withMetroSupervisingTrans
 import { Log } from '../../../log';
 import { FileNotifier } from '../../../utils/FileNotifier';
 import { env } from '../../../utils/env';
+import { CommandError } from '../../../utils/errors';
 import { installExitHooks } from '../../../utils/exit';
 import { isInteractive } from '../../../utils/interactive';
 import { loadTsConfigPathsAsync, TsConfigPaths } from '../../../utils/tsconfig/loadTsConfigPaths';
 import { resolveWithTsConfigPaths } from '../../../utils/tsconfig/resolveWithTsConfigPaths';
 import { isServerEnvironment } from '../middleware/metroOptions';
 import { PlatformBundlers } from '../platformBundlers';
+import { throws } from 'assert';
 
 type Mutable<T> = { -readonly [K in keyof T]: T[K] };
 
@@ -708,15 +710,16 @@ export function withExtendedResolver(
         }
 
         if (normal.endsWith('react-native/Libraries/LogBox/LogBoxInspectorContainer.js')) {
-          try {
-            // If `@expo/log-box` is available, use it instead of the default implementation.
-            const expoLogBox = doResolve('@expo/log-box/swap-rn-logbox.js');
-            if (expoLogBox.type === 'sourceFile') {
-              debug('Using `@expo/log-box` implementation.');
-              return expoLogBox;
+          if (env.EXPO_UNSTABLE_LOG_BOX) {
+            try {
+              const expoLogBox = doResolve('@expo/log-box/swap-rn-logbox.js');
+              if (expoLogBox.type === 'sourceFile') {
+                debug('Using `@expo/log-box` implementation.');
+                return expoLogBox;
+              }
+            } catch {
+              // Fallback to the default LogBox implementation.
             }
-          } catch {
-            // Fallback to the default LogBox implementation.
           }
           debug('Using React Native LogBox implementation.');
         }

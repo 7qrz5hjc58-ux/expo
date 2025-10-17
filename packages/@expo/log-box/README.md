@@ -4,8 +4,10 @@ Replaces default RedBox and LogBox with Expo LogBox implementation.
 
 ## Usage
 
-To enabled the new UI, install this package and rebuild your application.
+> `expo` users do not need to install this package, it is already included.
 
-```bash
-npm install @expo/log-box
+```js
+EXPO_UNSTABLE_LOG_BOX=1 npx expo start
+EXPO_UNSTABLE_LOG_BOX=1 npx expo run ios
+EXPO_UNSTABLE_LOG_BOX=1 npx expo run android
 ```

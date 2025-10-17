@@ -1,4 +1,4 @@
-#if canImport(UIKit)
+#if EXPO_UNSTABLE_LOG_BOX
 
 import UIKit
 import WebKit
