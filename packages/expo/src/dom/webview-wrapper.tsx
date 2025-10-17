@@ -29,7 +29,8 @@ interface Props {
 }
 
 const RawWebView = React.forwardRef<object, Props>((props, ref) => {
-  const { children, dom, filePath, ref: _ref, ...marshalProps } = props as Props;
+  const { children, dom: domProps, filePath, ref: _ref, ...marshalProps } = props as Props;
+  const { overrideUri, ...dom } = domProps || {};
   if (__DEV__) {
     if (children !== undefined) {
       throw new Error(
@@ -66,7 +67,7 @@ const RawWebView = React.forwardRef<object, Props>((props, ref) => {
   const webView = resolveWebView(dom?.useExpoDOMWebView ?? false);
   const webviewRef = React.useRef<WebViewRef>(null);
   const domImperativeHandlePropsRef = React.useRef<string[]>([]);
-  const source = { uri: `${getBaseURL()}/${filePath}` };
+  const source = { uri: overrideUri ??`${getBaseURL()}/${filePath}` };
   const [containerStyle, setContainerStyle] = React.useState<WebViewProps['containerStyle']>(null);
 
   const { debugZeroHeightStyle, debugOnLayout } = useDebugZeroHeight(dom);
@@ -129,7 +130,6 @@ const RawWebView = React.forwardRef<object, Props>((props, ref) => {
         subscription.remove();
       });
     },
-    source,
     ...dom,
     containerStyle: [containerStyle, debugZeroHeightStyle, dom?.containerStyle],
     onLayout: __DEV__ ? debugOnLayout : dom?.onLayout,
@@ -144,6 +144,7 @@ const RawWebView = React.forwardRef<object, Props>((props, ref) => {
       .join('\n'),
     // @ts-expect-error: TODO(@kitten): untyped ref for now
     ref: webviewRef,
+    source,
     style: [
       dom?.style ? { flex: 1, backgroundColor: 'transparent' } : { backgroundColor: 'transparent' },
       dom?.style,
