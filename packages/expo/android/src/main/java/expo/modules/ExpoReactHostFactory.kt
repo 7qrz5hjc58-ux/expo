@@ -126,12 +126,12 @@ object ExpoReactHostFactory {
       }
 
       val reactHostImpl = ReactHostImpl(
-          context,
-          reactHostDelegate,
-          componentFactory,
-          true,
-          useDevSupport
-        )
+        context,
+        reactHostDelegate,
+        componentFactory,
+        true,
+        useDevSupport
+      )
       hostHandlers.forEach { handler ->
         handler.onDidCreateDevSupportManager(reactHostImpl.devSupportManager)
       }

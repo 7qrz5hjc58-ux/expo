@@ -8,17 +8,17 @@ import expo.modules.core.interfaces.Package
 import expo.modules.core.interfaces.ReactActivityLifecycleListener
 
 class ExpoLogBoxPackage : Package {
-    override fun createReactActivityLifecycleListeners(activityContext: Context?): List<ReactActivityLifecycleListener> {
-        if (!BuildConfig.DEBUG) {
-            return emptyList()
-        }
-
-        return listOf(
-            object : ReactActivityLifecycleListener {
-                override fun onCreate(activity: Activity, savedInstanceState: Bundle?) {
-                    injectExpoLogBoxDevSupportManager((activity.application as ReactApplication).reactHost)
-                }
-            }
-        )
+  override fun createReactActivityLifecycleListeners(activityContext: Context?): List<ReactActivityLifecycleListener> {
+    if (!BuildConfig.DEBUG) {
+      return emptyList()
     }
+
+    return listOf(
+      object : ReactActivityLifecycleListener {
+        override fun onCreate(activity: Activity, savedInstanceState: Bundle?) {
+          injectExpoLogBoxDevSupportManager((activity.application as ReactApplication).reactHost)
+        }
+      }
+    )
+  }
 }
