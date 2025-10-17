@@ -250,11 +250,11 @@ function useRejectionHandler() {
     function onUnhandledError(ev: ErrorEvent) {
       hasError.current = true;
 
-      const error = ev?.error;
+      const error: Error & { componentStack?: string | null } | undefined | object = ev?.error;
       if (!error || !(error instanceof Error) || typeof error.stack !== 'string') {
         return;
       }
-
+      error.componentStack = React.captureOwnerStack();
       LogBoxData.addException(error);
     }
 
