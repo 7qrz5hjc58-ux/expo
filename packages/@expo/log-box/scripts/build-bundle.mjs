@@ -1,5 +1,8 @@
 #!/usr/bin/env node
 
+// Build the ExpoLogBox.bundle DOM Component.
+// Use `yarn build` to run this script.
+
 import spawn from '@expo/spawn-async';
 import { globSync } from 'glob';
 import { rm, rename } from 'node:fs/promises';
