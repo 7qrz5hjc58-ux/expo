@@ -96,7 +96,7 @@ function formatProjectFilePath(projectRoot = '', file = null) {
     }
     return pathRelativeToPath(file.replace(/\\/g, '/'), projectRoot.replace(/\\/g, '/')).replace(/\?.*$/, '');
 }
-function getFormattedStackTrace(projectRoot, stack) {
+function getFormattedStackTrace(stack, projectRoot = '') {
     return stack
         .map((frame) => {
         let stack = `  at `;

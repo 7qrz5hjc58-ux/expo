@@ -117,7 +117,7 @@ function LogBoxInspector({ log, selectedLogIndex, logs, }) {
             react_1.default.createElement(LogBoxContent, { log: log, selectedLogIndex: selectedLogIndex, logs: logs, isDismissable: isDismissable, onMinimize: onMinimize }))));
 }
 function LogBoxContent({ log, selectedLogIndex, logs, isDismissable, onMinimize, }) {
-    const { projectRoot, sdkVersion } = (0, ContextDevServer_1.useDevServer)();
+    const { serverRoot, sdkVersion } = (0, ContextDevServer_1.useDevServer)();
     const onDismiss = () => {
         // Here we handle the cases when the log is dismissed and it
         // was either the last log, or when the current index
@@ -166,11 +166,11 @@ function LogBoxContent({ log, selectedLogIndex, logs, isDismissable, onMinimize,
         const errContents = [log.message.content.trim()];
         const componentStack = log.getAvailableStack('component');
         if (componentStack?.length) {
-            errContents.push('', 'Component Stack', (0, devServerEndpoints_1.getFormattedStackTrace)(projectRoot ?? '', componentStack));
+            errContents.push('', 'Component Stack', (0, devServerEndpoints_1.getFormattedStackTrace)(componentStack, serverRoot));
         }
         const stackTrace = log.getAvailableStack('stack');
         if (stackTrace?.length) {
-            errContents.push('', 'Call Stack', (0, devServerEndpoints_1.getFormattedStackTrace)(projectRoot ?? '', stackTrace));
+            errContents.push('', 'Call Stack', (0, devServerEndpoints_1.getFormattedStackTrace)(stackTrace, serverRoot));
         }
         // @ts-ignore
         if (typeof __polyfill_onCopyText === 'function') {
@@ -225,7 +225,7 @@ function LogBoxContent({ log, selectedLogIndex, logs, isDismissable, onMinimize,
         react_1.default.createElement("div", { className: Overlay_module_css_1.default.scroll, ref: scrollRef },
             react_1.default.createElement(ErrorMessageHeader, { collapsed: collapsed, onPress: () => setCollapsed(!collapsed), message: log.message, level: log.level, title: headerTitle }),
             react_1.default.createElement("div", { style: { padding: '0 1rem', gap: 10, display: 'flex', flexDirection: 'column' } },
-                codeFrames.map(([key, codeFrame]) => (react_1.default.createElement(CodeFrame_1.ErrorCodeFrame, { key: key, projectRoot: projectRoot, codeFrame: codeFrame }))),
+                codeFrames.map(([key, codeFrame]) => (react_1.default.createElement(CodeFrame_1.ErrorCodeFrame, { key: key, showPathsRelativeTo: serverRoot, codeFrame: codeFrame }))),
                 log.isMissingModuleError && (react_1.default.createElement(InstallMissingModuleTerminal, { moduleName: log.isMissingModuleError })),
                 !!log?.componentStack?.length && (react_1.default.createElement(StackTraceList_1.StackTraceList, { key: selectedLogIndex + '-component-stack', type: "component", stack: log.getAvailableStack('component'), symbolicationStatus: log.getStackStatus('component'), 
                     // eslint-disable-next-line react/jsx-no-bind

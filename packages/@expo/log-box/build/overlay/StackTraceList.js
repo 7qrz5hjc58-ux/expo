@@ -264,8 +264,8 @@ function StackTraceList({ onRetry, type, stack, symbolicationStatus, }) {
                 }), showCollapsed: !collapsed, isInitial: isInitial }))));
 }
 function StackTraceItem({ frame, onPress, isLaunchable, }) {
-    const { projectRoot } = (0, ContextDevServer_1.useDevServer)();
-    const fileName = (0, devServerEndpoints_1.getStackFormattedLocation)(projectRoot, frame);
+    const { serverRoot } = (0, ContextDevServer_1.useDevServer)();
+    const fileName = (0, devServerEndpoints_1.getStackFormattedLocation)(serverRoot, frame);
     return (react_1.default.createElement("div", { "aria-disabled": !isLaunchable ? true : undefined, onClick: onPress, className: StackTraceList_module_css_1.default.stackFrame, style: {
             opacity: frame.collapse === true ? 0.4 : 1,
         } },

@@ -38,7 +38,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ErrorCodeFrame = ErrorCodeFrame;
 exports.Terminal = Terminal;
-exports.CodeFrame = CodeFrame;
 exports.FileIcon = FileIcon;
 exports.TerminalIcon = TerminalIcon;
 /**
@@ -52,12 +51,12 @@ const react_native_1 = require("react-native");
 const AnsiHighlight_1 = require("./AnsiHighlight");
 const CodeFrame_module_css_1 = __importDefault(require("./CodeFrame.module.css"));
 const devServerEndpoints_1 = require("../utils/devServerEndpoints");
-function ErrorCodeFrame({ projectRoot, codeFrame, }) {
+function ErrorCodeFrame({ showPathsRelativeTo, codeFrame, }) {
     if (codeFrame == null) {
         return null;
     }
     function getFileName() {
-        return (0, devServerEndpoints_1.formatProjectFilePath)(projectRoot ?? '', codeFrame?.fileName);
+        return (0, devServerEndpoints_1.formatProjectFilePath)(showPathsRelativeTo, codeFrame?.fileName);
     }
     function getLocation() {
         const location = codeFrame?.location;
