@@ -19,7 +19,7 @@
 
 - [android] Add getDefaultReactHost to ExpoReactHostFactory ([#40086](https://github.com/expo/expo/pull/40086) by [@gabrieldonadel](https://github.com/gabrieldonadel))
 - [Android] Remove edge-to-edge logic from `ReactActivityDelegateWrapper`. ([#40263](https://github.com/expo/expo/pull/40263) by [@behenate](https://github.com/behenate))
-- [internal] Fork `HMRClient` for native builds.
+- [internal] Fork `HMRClient` for native builds. ([#40449](https://github.com/expo/expo/pull/40449) by [@krystofwoldrich](https://github.com/krystofwoldrich))
 
 ### ⚠️ Notices
 
