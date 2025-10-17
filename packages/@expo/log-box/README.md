@@ -1,6 +1,6 @@
 # @expo/log-box
 
-Replaces default RedBox and LogBox with Expo LogBox implementation.
+Error overlay for universal Expo apps. Replaces default RedBox and LogBox with Expo LogBox implementation.
 
 ## Usage
 

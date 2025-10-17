@@ -47,5 +47,5 @@
   "license": "MIT",
   "author": "Expo",
   "homepage": "https://github.com/expo/expo/tree/main/packages/@expo/log-box",
-  "description": "Expo LogBox provides an improved debugging UI for React Native, succeeding the default RedBox and LogBox."
+  "description": "Error overlay for universal Expo apps."
 }
