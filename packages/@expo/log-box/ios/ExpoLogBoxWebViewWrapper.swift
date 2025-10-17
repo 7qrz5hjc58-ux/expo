@@ -1,3 +1,5 @@
+// Keep in sync with webview-wrapper.tsx
+// https://github.com/expo/expo/blob/main/packages/expo/src/dom/webview-wrapper.tsx
 #if canImport(UIKit) && EXPO_UNSTABLE_LOG_BOX
 
 import UIKit

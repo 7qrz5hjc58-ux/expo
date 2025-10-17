@@ -1,3 +1,5 @@
+// Keep in sync with webview-wrapper.tsx
+// https://github.com/expo/expo/blob/main/packages/expo/src/dom/webview-wrapper.tsx
 package expo.modules.logbox
 
 import android.app.Activity

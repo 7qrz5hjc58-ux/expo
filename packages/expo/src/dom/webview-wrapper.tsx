@@ -1,4 +1,8 @@
 // A webview without babel to test faster.
+//
+// Keep in sync with ExpoLogBox native webview wrappers.
+// Android https://github.com/expo/expo/blob/main/packages/%40expo/log-box/android/src/main/expo/modules/logbox/ExpoLogBoxWebViewWrapper.kt
+// iOS https://github.com/expo/expo/blob/main/packages/%40expo/log-box/ios/ExpoLogBoxWebViewWrapper.swift
 import React from 'react';
 import { AppState } from 'react-native';
 
