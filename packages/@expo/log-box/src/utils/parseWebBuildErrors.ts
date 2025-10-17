@@ -1,5 +1,3 @@
-import * as path from 'node:path';
-
 import { MetroPackageResolutionError } from '../Data/BuildErrors';
 import { LogBoxLogDataLegacy, MetroStackFrame } from '../Data/Types';
 
@@ -27,7 +25,8 @@ export function parseWebBuildErrors({
     // Syntax errors in static rendering.
     stack = [
       {
-        file: path.join(projectRoot, error.filename),
+        // Avoid using node:path to be compatible with web and RN runtime.
+        file: `${projectRoot}/${error.filename}`,
         methodName: '<unknown>',
         arguments: [],
         // TODO: Import stack
