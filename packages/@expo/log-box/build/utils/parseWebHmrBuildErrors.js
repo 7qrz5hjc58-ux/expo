@@ -2,6 +2,11 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.parseWebHmrBuildErrors = parseWebHmrBuildErrors;
 const BuildErrors_1 = require("../Data/BuildErrors");
+/**
+ * Called in expo/async-require/hmr, the return value passed thru multiple steps, eventually
+ * being passed to LogBox.addException (check for MetroErrorType or fallback parses the object)
+ * in the web runtime.
+ */
 function parseWebHmrBuildErrors(data) {
     const message = [data.type, data.message].filter(Boolean).join(' ');
     const type = data.type;

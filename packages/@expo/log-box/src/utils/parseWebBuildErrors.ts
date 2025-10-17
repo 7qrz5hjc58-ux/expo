@@ -3,6 +3,10 @@ import * as path from 'node:path';
 import { MetroPackageResolutionError } from '../Data/BuildErrors';
 import { LogBoxLogDataLegacy, MetroStackFrame } from '../Data/Types';
 
+/**
+ * Called in expo/cli, the return value is injected into the static error page which is bundled
+ * instead of the app when the web build fails.
+ */
 export function parseWebBuildErrors({
   error,
   projectRoot,

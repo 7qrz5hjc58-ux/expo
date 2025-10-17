@@ -4,6 +4,11 @@ import {
   MetroTransformError,
 } from '../Data/BuildErrors';
 
+/**
+ * Called in expo/async-require/hmr, the return value passed thru multiple steps, eventually
+ * being passed to LogBox.addException (check for MetroErrorType or fallback parses the object)
+ * in the web runtime.
+ */
 export function parseWebHmrBuildErrors(data: object): MetroBuildError {
   const message = [(data as any).type, (data as any).message].filter(Boolean).join(' ');
 

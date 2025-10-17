@@ -6,10 +6,8 @@ import { ActionsContext } from './ContextActions';
 import { RuntimePlatformContext } from './ContextPlatform';
 import * as LogBoxData from './Data/LogBoxData';
 import { LogBoxLog, LogContext } from './Data/LogBoxLog';
-import type { StackType } from './Data/Types';
-import { parseLogBoxException } from './Data/parseLogBoxLog';
 import { LogBoxInspectorContainer } from './overlay/Overlay';
-import type { CodeFrame } from './utils/devServerEndpoints';
+import { convertNativeToExpoLogBoxLog, convertToExpoLogBoxLog } from './utils/convertLogBoxLog';
 
 export default function LogBoxPolyfillDOM({
   onMinimize,
@@ -17,7 +15,6 @@ export default function LogBoxPolyfillDOM({
   platform,
   fetchJsonAsync,
   reloadRuntime,
-  devServerUrl,
   ...props
 }: {
   onCopyText?: (text: string) => void;
@@ -48,111 +45,12 @@ export default function LogBoxPolyfillDOM({
   const logs = React.useMemo(() => {
     return [
       // Convert from React Native style to Expo style LogBoxLog
-      ...(props.logs?.map(
-        ({ symbolicated, symbolicatedComponentStack, codeFrame, componentCodeFrame, ...log }) => {
-          const outputCodeFrame: Partial<Record<StackType, CodeFrame>> = {};
-
-          if (codeFrame) {
-            outputCodeFrame.stack = codeFrame;
-          }
-          if (componentCodeFrame) {
-            outputCodeFrame.component = componentCodeFrame;
-          }
-
-          const outputSymbolicated = {
-            stack: {
-              error: null,
-              stack: null,
-              status: 'NONE',
-            },
-            component: {
-              error: null,
-              stack: null,
-              status: 'NONE',
-            },
-          };
-
-          if (symbolicated) {
-            outputSymbolicated.stack = symbolicated;
-          }
-          if (symbolicatedComponentStack) {
-            outputSymbolicated.component = {
-              error: symbolicatedComponentStack.error,
-              // @ts-ignore
-              stack: symbolicatedComponentStack.componentStack?.map((frame) => ({
-                // From the upstream style (incorrect)
-                // {
-                //   "fileName": "/Users/evanbacon/Documents/GitHub/expo/node_modules/react-native/Libraries/Components/View/View.js",
-                //   "location": { "row": 32, "column": 33 },
-                //   "content": "React.forwardRef$argument_0",
-                //   "collapse": false
-                // },
-
-                // To the stack frame style (correct)
-                column: frame.location?.column,
-                file: frame.fileName,
-                lineNumber: frame.location?.row,
-                methodName: frame.content,
-                collapse: frame.collapse,
-              })),
-              status: symbolicatedComponentStack.status,
-            };
-          }
-
-          return new LogBoxLog({
-            ...log,
-
-            codeFrame: outputCodeFrame,
-            symbolicated: outputSymbolicated,
-          });
-        }
-      ) ?? []),
+      ...(props.logs ?? []).map(convertToExpoLogBoxLog),
       // Convert native logs to Expo Log Box format
-      ...(props.nativeLogs?.map(({ message, stack }) => {
-        let processedMessage = message;
-        let processedStack = stack || [];
-
-        if (processedMessage.startsWith('Unable to load script.')) {
-          // Unable to load script native JVM stack is not useful.
-          processedStack = [];
-        }
-
-        if (platform === 'android') {
-          try {
-            const bodyIndex = processedMessage.indexOf('Body:');
-            if (bodyIndex !== -1) {
-              const originalJson = processedMessage.slice(bodyIndex + 5);
-              if (originalJson) {
-                const originalErrorResponseBody = JSON.parse(originalJson);
-                processedMessage = originalErrorResponseBody.message;
-              }
-            }
-          } catch (e) {
-            // Ignore JSON parse errors
-          }
-        }
-
-        const log = new LogBoxLog(
-          parseLogBoxException({
-            originalMessage: processedMessage,
-            stack: processedStack,
-          })
-        );
-        // Never show stack for native errors, these are typically bundling errors, component stack would lead to LogBox.
-        log.componentStack = [];
-        return log;
-      }) ?? []),
+      ...(props.nativeLogs ?? []).map(convertNativeToExpoLogBoxLog(platform)), // TODO: use EXPO_DOM_HOST_OS
     ];
   }, [props.logs, props.nativeLogs, platform]);
   const selectedIndex = props.selectedIndex ?? (logs && logs?.length - 1) ?? -1;
-
-  if (devServerUrl) {
-    globalThis.process = globalThis.process || {};
-    globalThis.process.env = {
-      ...globalThis.process.env,
-      EXPO_DEV_SERVER_ORIGIN: devServerUrl,
-    };
-  }
 
   // @ts-ignore
   globalThis.__polyfill_onCopyText = onCopyText;
@@ -185,7 +83,7 @@ export default function LogBoxPolyfillDOM({
   // @ts-ignore
   globalThis.__polyfill_dom_reloadRuntime = reloadRuntime;
   useViewportMeta('width=device-width, initial-scale=1, viewport-fit=cover');
-
+  useExpoDevServerOriginPolyfill(props);
   useNativeLogBoxDataPolyfill({ logs }, props);
 
   return (
@@ -202,6 +100,22 @@ export default function LogBoxPolyfillDOM({
       </RuntimePlatformContext>
     </LogContext>
   );
+}
+
+function useExpoDevServerOriginPolyfill({
+  devServerUrl,
+}: {
+  devServerUrl?: string;
+}) {
+  if (!devServerUrl) {
+    return;
+  }
+
+  globalThis.process = globalThis.process || {};
+  globalThis.process.env = {
+    ...globalThis.process.env,
+    EXPO_DEV_SERVER_ORIGIN: devServerUrl,
+  };
 }
 
 function useNativeLogBoxDataPolyfill(

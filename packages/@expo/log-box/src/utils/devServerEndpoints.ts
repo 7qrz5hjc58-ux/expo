@@ -1,14 +1,4 @@
-import type { MetroStackFrame } from '../Data/Types';
-
-export type CodeFrame = {
-  content: string;
-  location?: {
-    row: number;
-    column: number;
-    [key: string]: any;
-  };
-  fileName: string;
-};
+import type { CodeFrame, MetroStackFrame } from '../Data/Types';
 
 export type SymbolicatedStackTrace = {
   stack: MetroStackFrame[];

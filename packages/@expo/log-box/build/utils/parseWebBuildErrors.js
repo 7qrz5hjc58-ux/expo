@@ -36,6 +36,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.parseWebBuildErrors = parseWebBuildErrors;
 const path = __importStar(require("node:path"));
 const BuildErrors_1 = require("../Data/BuildErrors");
+/**
+ * Called in expo/cli, the return value is injected into the static error page which is bundled
+ * instead of the app when the web build fails.
+ */
 function parseWebBuildErrors({ error, projectRoot, parseErrorStack, }) {
     // NOTE: Ideally this will be merged with the parseWebHmrBuildErrors function
     // Remap direct Metro Node.js errors to a format that will appear more client-friendly in the logbox UI.
