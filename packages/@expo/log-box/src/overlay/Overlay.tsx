@@ -75,7 +75,6 @@ function LogBoxInspector({
       } else {
         animateClose(() => {
           onMinimizeAction?.();
-          console.log('onMinimizeAction called', typeof cb);
           cb?.();
         });
       }

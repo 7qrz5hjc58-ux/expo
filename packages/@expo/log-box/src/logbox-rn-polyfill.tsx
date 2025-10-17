@@ -61,7 +61,7 @@ function LogBoxRNPolyfill(props: {
   const LogBoxWrapper = useMemo(
     () =>
       Platform.OS === 'ios'
-        ? ({ children }: { children: React.ReactNode }) => {
+        ? ({ children, open }: { children?: React.ReactNode; open: boolean }) => {
             return (
               <Modal
                 animationType="slide"
@@ -72,12 +72,12 @@ function LogBoxRNPolyfill(props: {
               </Modal>
             );
           }
-        : ({ children }: { children: React.ReactNode }) => <>{children}</>,
+        : ({ children }: { children?: React.ReactNode; open: boolean }) => <>{children}</>,
     []
   );
 
   return (
-    <LogBoxWrapper>
+    <LogBoxWrapper open={open}>
       <View
         style={{
           backgroundColor: Platform.select({ default: undefined, ios: Colors.background }),
