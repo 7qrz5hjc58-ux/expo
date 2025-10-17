@@ -139,15 +139,23 @@ function LogBoxContent({
     // Here we handle the cases when the log is dismissed and it
     // was either the last log, or when the current index
     // is now outside the bounds of the log array.
-    if (selectedLogIndex != null) {
-      if (logs.length - 1 <= 0) {
-        onMinimize(() => {
-          LogBoxData.dismiss(logs[selectedLogIndex]);
-        });
-      } else if (selectedLogIndex >= logs.length - 1) {
-        LogBoxData.setSelectedLog(selectedLogIndex - 1);
-        LogBoxData.dismiss(logs[selectedLogIndex]);
+    if (selectedLogIndex === null) return;
+
+    if (logs.length - 1 <= 0) {
+      // Only one log, minimize the overlay and dismiss (remove) the log.
+      onMinimize(() => {
+        LogBoxData.dismiss(logs[0]);
+      });
+    } else if (selectedLogIndex <= logs.length - 1) {
+      // Multiple logs, calculate the new selected, select it and dismiss (remove) the previously selected.
+      const toDismissIndex = selectedLogIndex;
+      // If we dismiss (remove) the first (toDismissIndex = 0) log, select the closes next log
+      // (second one, which will become also the first log in the array)
+      // so we stay at index 0, no setSelectedLog call needed.
+      if (toDismissIndex !== 0) {
+        LogBoxData.setSelectedLog(toDismissIndex - 1);
       }
+      LogBoxData.dismiss(logs[toDismissIndex]);
     }
   };
 
