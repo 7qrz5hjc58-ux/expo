@@ -40,6 +40,7 @@ import { loadTsConfigPathsAsync, TsConfigPaths } from '../../../utils/tsconfig/l
 import { resolveWithTsConfigPaths } from '../../../utils/tsconfig/resolveWithTsConfigPaths';
 import { isServerEnvironment } from '../middleware/metroOptions';
 import { PlatformBundlers } from '../platformBundlers';
+import { throws } from 'assert';
 
 type Mutable<T> = { -readonly [K in keyof T]: T[K] };
 
@@ -709,23 +710,17 @@ export function withExtendedResolver(
 
         if (normal.endsWith('react-native/Libraries/LogBox/LogBoxInspectorContainer.js')) {
           if (env.EXPO_UNSTABLE_LOG_BOX) {
-            debug('Using Expo LogBox implementation.');
-
             try {
-              const logBoxPath = require.resolve('@expo/log-box/swap-rn-logbox.js');
-              return {
-                ...result,
-                filePath: logBoxPath,
-              };
+              const expoLogBox = doResolve('@expo/log-box/swap-rn-logbox.js');
+              if (expoLogBox.type === 'sourceFile') {
+                debug('Using `@expo/log-box` implementation.');
+                return expoLogBox;
+              }
             } catch {
-              console.warn(
-                'Failed to resolve `@expo/log-box`, falling back to React Native LogBox.'
-              );
-              return result;
+              // Fallback to the default LogBox implementation.
             }
-          } else {
-            debug('Using React Native LogBox implementation.');
           }
+          debug('Using React Native LogBox implementation.');
         }
       }
 
