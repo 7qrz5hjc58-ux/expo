@@ -15,7 +15,7 @@ exports.parseLogBoxException = parseLogBoxException;
 exports.isError = isError;
 exports.parseLogBoxLog = parseLogBoxLog;
 const react_1 = __importDefault(require("react"));
-const devServerEndpoints_1 = require("../utils/devServerEndpoints");
+const parseErrorStack_1 = require("../utils/parseErrorStack");
 const BABEL_TRANSFORM_ERROR_FORMAT = /^(?:TransformError )?(?:SyntaxError: |ReferenceError: )(.*): (.*) \((\d+):(\d+)\)\n\n([\s\S]+)/;
 const BABEL_CODE_FRAME_ERROR_FORMAT = /^(?:TransformError )?(?:.*):? (?:.*?)([/|\\].*): ([\s\S]+?)\n([ >]{2}[\d\s]+ \|[\s\S]+|\u{001b}[\s\S]+)/u;
 const METRO_ERROR_FORMAT = /^(?:(?:InternalError )?Metro has encountered an error:) (.*): (.*) \((\d+):(\d+)\)\n\n([\s\S]+)/u;
@@ -180,7 +180,7 @@ function parseLogBoxException(error) {
             stack: error.stack,
             codeFrame: {},
             isComponentError: error.isComponentError,
-            componentStack: componentStack != null ? (0, devServerEndpoints_1.parseErrorStack)(componentStack) : [],
+            componentStack: componentStack != null ? (0, parseErrorStack_1.parseErrorStack)(componentStack) : [],
             ...parseInterpolation([message]),
         };
     }
@@ -191,7 +191,7 @@ function parseLogBoxException(error) {
             stack: error.stack,
             codeFrame: {},
             isComponentError: error.isComponentError,
-            componentStack: (0, devServerEndpoints_1.parseErrorStack)(componentStack),
+            componentStack: (0, parseErrorStack_1.parseErrorStack)(componentStack),
             ...parseInterpolation([message]),
         };
     }
@@ -335,7 +335,7 @@ function parseLogBoxLog(args) {
         error = processReactErrorDetails(error);
     }
     return {
-        componentStack: (0, devServerEndpoints_1.parseErrorStack)(error.stack ?? ''),
+        componentStack: (0, parseErrorStack_1.parseErrorStack)(error.stack ?? ''),
         category: error.message,
         message: {
             content: message,

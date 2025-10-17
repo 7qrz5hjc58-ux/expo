@@ -1,6 +1,6 @@
 import type { LogBoxLogData, LogBoxLogDataLegacy } from './Types';
 import { parseInterpolation } from './parseLogBoxLog';
-import { parseErrorStack } from '../utils/devServerEndpoints';
+import { parseErrorStack } from '../utils/parseErrorStack';
 
 type MetroFormattedError = {
   description: string;

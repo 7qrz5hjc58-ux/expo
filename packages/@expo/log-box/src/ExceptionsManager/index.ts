@@ -6,7 +6,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import { parseErrorStack } from '../utils/devServerEndpoints';
+import { parseErrorStack } from '../utils/parseErrorStack';
 
 type ExtendedError = any;
 

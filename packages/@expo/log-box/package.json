@@ -1,9 +1,9 @@
 {
   "name": "@expo/log-box",
   "version": "0.0.13-canary-20251008-6acbc1c",
-  "main": "src/index.ts",
+  "main": "app/index.ts",
   "scripts": {
-    "start": "expo",
+    "start": "expo start",
     "lint": "expo-module lint",
     "typecheck": "expo-module typecheck",
     "clean": "run-p clean:lib clean:bundle",

@@ -9,7 +9,7 @@
 import React from 'react';
 
 import type { Category, LogBoxLogData, Message, MetroStackFrame } from './Types';
-import { parseErrorStack } from '../utils/devServerEndpoints';
+import { parseErrorStack } from '../utils/parseErrorStack';
 
 type ExceptionData = any;
 

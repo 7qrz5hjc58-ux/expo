@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MetroPackageResolutionError = exports.MetroTransformError = exports.MetroBuildError = void 0;
 const parseLogBoxLog_1 = require("./parseLogBoxLog");
-const devServerEndpoints_1 = require("../utils/devServerEndpoints");
+const parseErrorStack_1 = require("../utils/parseErrorStack");
 const METRO_ERROR_FORMAT = /^(?:InternalError Metro has encountered an error:) (.*): (.*) \((\d+):(\d+)\)\n\n([\s\S]+)/u;
 class MetroBuildError extends Error {
     errorType;
@@ -69,7 +69,7 @@ class MetroBuildError extends Error {
         }
         return {
             level: 'fatal',
-            stack: (0, devServerEndpoints_1.parseErrorStack)(this.stack),
+            stack: (0, parseErrorStack_1.parseErrorStack)(this.stack),
             codeFrame: {},
             isComponentError: false,
             componentStack: [],

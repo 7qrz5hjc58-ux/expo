@@ -53,7 +53,7 @@ function convertError(error: any) {
 export function renderRootComponent(Component: React.ComponentType<any>) {
   try {
     if (process.env.NODE_ENV !== 'production') {
-      require('@expo/log-box').setupLogBox();
+      require('@expo/log-box/lib').setupLogBox();
     }
 
     // This must be delayed so the user has a chance to call it first.

@@ -102,7 +102,7 @@ export function registerDOMComponent(AppModule: any) {
 
   try {
     if (process.env.NODE_ENV !== 'production') {
-      require('@expo/log-box').setupLogBox();
+      require('@expo/log-box/lib').setupLogBox();
     }
 
     React.startTransition(() => {

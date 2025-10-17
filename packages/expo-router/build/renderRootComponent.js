@@ -34,7 +34,6 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.renderRootComponent = renderRootComponent;
-const log_box_1 = require("@expo/log-box");
 const expo_1 = require("expo");
 const React = __importStar(require("react"));
 const react_native_1 = require("react-native");
@@ -80,7 +79,7 @@ function convertError(error) {
 function renderRootComponent(Component) {
     try {
         if (process.env.NODE_ENV !== 'production') {
-            (0, log_box_1.setupLogBox)();
+            require('@expo/log-box/lib').setupLogBox();
         }
         // This must be delayed so the user has a chance to call it first.
         setTimeout(() => {

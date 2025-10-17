@@ -1,4 +1,6 @@
 "use strict";
+// This is the main export for `@expo/log-box/utils` used in the `@expo/cli` and `expo/async-require/hmr`
+// This needs to be transpiled to CJS for use in the Expo CLI
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.parseWebBuildErrors = exports.parseWebHmrBuildErrors = void 0;
 var parseWebHmrBuildErrors_1 = require("./utils/parseWebHmrBuildErrors");

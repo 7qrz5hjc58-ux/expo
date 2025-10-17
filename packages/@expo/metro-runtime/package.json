@@ -15,10 +15,7 @@
     "rsc",
     "async-require.js",
     "async-require.d.ts",
-    "error-overlay.js",
-    "error-overlay.d.ts",
     "assets",
-    "swap-rn-logbox.js",
     "!**/__tests__"
   ],
   "scripts": {
