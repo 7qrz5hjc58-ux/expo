@@ -34,21 +34,17 @@ class ExpoLogBoxSurfaceDelegate(private val devSupportManager: DevSupportManager
   private var dialog: Dialog? = null
   private var webView: WebView? = null
 
-  override fun createContentView(appKey: String) {
-    // Noop
-  }
+  override fun createContentView(appKey: String) = Unit
 
   override fun isContentViewReady(): Boolean {
     return true
   }
 
-  override fun destroyContentView() {
-    // Noop
-  }
+  override fun destroyContentView() = Unit
 
   override fun show() {
-    val context: Activity? = devSupportManager.currentActivity
-    if (context == null || context.isFinishing) {
+    val context: Activity = devSupportManager.currentActivity ?: return
+    if (context.isFinishing) {
       devSupportManager.currentReactContext?.let { reactContext ->
         /**
          * If the activity isn't available, try again after the next onHostResume(). onHostResume()
@@ -62,136 +58,132 @@ class ExpoLogBoxSurfaceDelegate(private val devSupportManager: DevSupportManager
 
     val devServerOrigin = "http://${AndroidInfoHelpers.getServerHost(context)}"
 
-    // Create the BottomSheetDialog
     dialog = Dialog(context, android.R.style.Theme_NoTitleBar)
     val rootContainer = FrameLayout(context).apply {
       fitsSystemWindows = true
     }
-    // Create a simple layout programmatically
     webView = WebView(context).apply {
       setBackgroundColor(Color.BLACK)
       settings.javaScriptEnabled = true
       setWebContentsDebuggingEnabled(true)
-    }
+      addJavascriptInterface(
+        object : Any() {
+          @JavascriptInterface
+          fun postMessage(rawMessage: String) {
+            val gson = Gson()
+            val jsonObject = gson.fromJson(rawMessage, JsonObject::class.java)
 
-    webView?.addJavascriptInterface(
-      object : Any() {
-        @JavascriptInterface
-        fun postMessage(rawMessage: String) {
-          val gson = Gson()
-          val jsonObject = gson.fromJson(rawMessage, JsonObject::class.java)
+            val messageType = jsonObject.getAsJsonPrimitive("type")
 
-          val messageType = jsonObject.getAsJsonPrimitive("type")
-
-          if (messageType.isString && messageType.asString == NATIVE_ACTION) {
-            val data = jsonObject.getAsJsonObject("data")
-            val actionId = data.getAsJsonPrimitive("actionId")
-            val uid = data.getAsJsonPrimitive("uid")
-            val args = data.getAsJsonArray("args")
-            if (!actionId.isString || !uid.isString || !args.isJsonArray) {
-              return
-            }
-
-            when (actionId.asString) {
-              "reloadRuntime" -> {
-                reloadRuntime()
+            if (messageType.isString && messageType.asString == NATIVE_ACTION) {
+              val data = jsonObject.getAsJsonObject("data")
+              val actionId = data.getAsJsonPrimitive("actionId")
+              val uid = data.getAsJsonPrimitive("uid")
+              val args = data.getAsJsonArray("args")
+              if (!actionId.isString || !uid.isString || !args.isJsonArray) {
+                return
               }
-              "fetchJsonAsync" -> {
-                CoroutineScope(Dispatchers.Default).launch {
-                  val url = when {
-                    args.get(0).isJsonPrimitive &&
-                      args.get(0).asJsonPrimitive.isString
-                    -> args.get(0).asJsonPrimitive.asString
-                    else -> null
-                  }
-                  val options = args.get(1).asJsonObject
-                  val method = when {
-                    options.has("method") &&
-                      options.get("method").isJsonPrimitive &&
-                      options.getAsJsonPrimitive("method").isString
-                    -> options.getAsJsonPrimitive("method").asString
-                    else -> null
-                  }
-                  val body = when {
-                    options.has("body") &&
-                      options.get("body").isJsonPrimitive &&
-                      options.getAsJsonPrimitive("body").isString
-                    -> options.getAsJsonPrimitive("body").asString
-                    else -> null
-                  }
 
-                  if (url != null) {
-                    fetchJsonAsync(
-                      url,
-                      method ?: "GET",
-                      body ?: "",
-                      { result ->
-                        sendReturn(result, uid.asString, actionId.asString)
-                      },
-                      { exception ->
-                        sendReturn(exception, uid.asString, actionId.asString)
-                      }
-                    )
+              when (actionId.asString) {
+                "reloadRuntime" -> {
+                  reloadRuntime()
+                }
+                "fetchJsonAsync" -> {
+                  CoroutineScope(Dispatchers.Default).launch {
+                    val url = when {
+                      args.get(0).isJsonPrimitive &&
+                              args.get(0).asJsonPrimitive.isString
+                        -> args.get(0).asJsonPrimitive.asString
+                      else -> null
+                    }
+                    val options = args.get(1).asJsonObject
+                    val method = when {
+                      options.has("method") &&
+                              options.get("method").isJsonPrimitive &&
+                              options.getAsJsonPrimitive("method").isString
+                        -> options.getAsJsonPrimitive("method").asString
+                      else -> null
+                    }
+                    val body = when {
+                      options.has("body") &&
+                              options.get("body").isJsonPrimitive &&
+                              options.getAsJsonPrimitive("body").isString
+                        -> options.getAsJsonPrimitive("body").asString
+                      else -> null
+                    }
+
+                    if (url != null) {
+                      fetchJsonAsync(
+                        url,
+                        method ?: "GET",
+                        body ?: "",
+                        { result ->
+                          sendReturn(result, uid.asString, actionId.asString)
+                        },
+                        { exception ->
+                          sendReturn(exception, uid.asString, actionId.asString)
+                        }
+                      )
+                    }
                   }
                 }
               }
             }
           }
-        }
-      },
-      "ReactNativeWebView"
-    )
+        },
+        "ReactNativeWebView"
+      )
+      webViewClient = object : WebViewClient() {
+        override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+          super.onPageStarted(view, url, favicon)
 
-    webView?.webViewClient = object : WebViewClient() {
-      override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
-        super.onPageStarted(view, url, favicon)
+          val errorMessage = devSupportManager.lastErrorTitle
+          val errorStack = devSupportManager.lastErrorStack?.map { frame ->
+            mapOf(
+              // Expected to match https://github.com/expo/expo/blob/5ed042a3547571fa70cf1d53db7c12b4bb966a90/packages/%40expo/log-box/src/devServerEndpoints.ts#L3
+              "file" to frame.file,
+              "methodName" to frame.method,
+              "arguments" to emptyArray<String>(),
+              "lineNumber" to frame.line,
+              "column" to frame.column,
+              "collapse" to frame.isCollapsed
+            )
+          }
 
-        val errorMessage = devSupportManager.lastErrorTitle
-        val errorStack = devSupportManager.lastErrorStack?.map { frame ->
-          mapOf(
-            // Expected to match https://github.com/expo/expo/blob/5ed042a3547571fa70cf1d53db7c12b4bb966a90/packages/%40expo/log-box/src/devServerEndpoints.ts#L3
-            "file" to frame.file,
-            "methodName" to frame.method,
-            "arguments" to emptyArray<String>(),
-            "lineNumber" to frame.line,
-            "column" to frame.column,
-            "collapse" to frame.isCollapsed
-          )
-        }
-
-        val initialProps = mapOf(
-          "names" to arrayOf(
-            "fetchJsonAsync",
-            "reloadRuntime"
-          ),
-          "props" to mapOf(
-            "platform" to "android",
-            "nativeLogs" to arrayOf(
-              mapOf(
-                "message" to errorMessage,
-                "stack" to errorStack
+          val initialProps = mapOf(
+            "names" to arrayOf(
+              "fetchJsonAsync",
+              "reloadRuntime"
+            ),
+            "props" to mapOf(
+              "platform" to "android",
+              "nativeLogs" to arrayOf(
+                mapOf(
+                  "message" to errorMessage,
+                  "stack" to errorStack
+                )
               )
             )
           )
-        )
 
-        val gson = Gson()
-        val jsonObject = gson.toJson(initialProps)
+          val gson = Gson()
+          val jsonObject = gson.toJson(initialProps)
 
-        val script = """
+          val script = """
                     var process=globalThis.process||{};process.env=process.env||{};process.env.EXPO_DEV_SERVER_ORIGIN='$devServerOrigin';
                     window.$$${"EXPO_INITIAL_PROPS"} = $jsonObject;
         """.trimIndent()
 
-        webView?.post {
-          webView?.evaluateJavascript(script, null)
+          webView?.post {
+            webView?.evaluateJavascript(script, null)
+          }
         }
       }
-    }
 
-    webView?.loadUrl("file:///android_asset/ExpoLogBox.bundle/index.html")
-    // TODO: use build config to specify the dev url
-    // webView.loadUrl("http://10.0.2.2:8090/")
+      // TODO: use build config to specify the dev url
+      // webView.loadUrl("http://10.0.2.2:8090/")
+      loadUrl("file:///android_asset/ExpoLogBox.bundle/index.html")
+    }
 
     rootContainer.addView(webView)
     dialog?.setContentView(rootContainer)
