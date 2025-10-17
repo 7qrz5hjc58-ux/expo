@@ -2,8 +2,8 @@
 
 import React from 'react';
 
-import { ActionsProvider } from './ContextActions';
-import { RuntimePlatformProvider } from './ContextPlatform';
+import { ActionsContext } from './ContextActions';
+import { RuntimePlatformContext } from './ContextPlatform';
 import * as LogBoxData from './Data/LogBoxData';
 import { LogBoxLog, LogContext } from './Data/LogBoxLog';
 import type { StackType } from './Data/Types';
@@ -189,18 +189,18 @@ export default function LogBoxPolyfillDOM({
   useNativeLogBoxDataPolyfill({ logs }, props);
 
   return (
-    <LogContext.Provider
+    <LogContext
       value={{
         selectedLogIndex: selectedIndex,
         isDisabled: false,
         logs,
       }}>
-      <RuntimePlatformProvider platform={platform}>
-        <ActionsProvider onMinimize={onMinimize}>
+      <RuntimePlatformContext platform={platform}>
+        <ActionsContext onMinimize={onMinimize}>
           <LogBoxInspectorContainer />
-        </ActionsProvider>
-      </RuntimePlatformProvider>
-    </LogContext.Provider>
+        </ActionsContext>
+      </RuntimePlatformContext>
+    </LogContext>
   );
 }
 
@@ -239,10 +239,5 @@ function useViewportMeta(content: string) {
     }
 
     meta.setAttribute('content', content);
-
-    return () => {
-      // Optionally reset or remove on cleanup
-      // meta.setAttribute('content', 'width=device-width, initial-scale=1');
-    };
   }, [content]);
 }

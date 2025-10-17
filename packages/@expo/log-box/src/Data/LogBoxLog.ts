@@ -213,7 +213,7 @@ export function useLogs(): {
   isDisabled: boolean;
   logs: LogBoxLog[];
 } {
-  const logs = React.useContext(LogContext);
+  const logs = React.use(LogContext);
 
   if (!logs) {
     throw new Error('useLogs must be used within a LogContext.Provider');

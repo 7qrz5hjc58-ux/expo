@@ -79,6 +79,7 @@ export async function fetchProjectMetadataAsync(): Promise<{
   serverRoot: string;
   sdkVersion: string;
 }> {
+  // Dev Server implementation https://github.com/expo/expo/blob/f29b9f3715e42dca87bf3eebf11f7e7dd1ff73c1/packages/%40expo/cli/src/start/server/metro/MetroBundlerDevServer.ts#L1145
   const url = new URL('/_expo/error-overlay-meta', getBaseUrl()).href;
 
   // @ts-ignore

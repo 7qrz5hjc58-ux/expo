@@ -49,7 +49,10 @@ function LogBoxRNPolyfill(props: {
 
   const closeModal = (cb: () => void) => {
     setOpen(false);
-    setTimeout(cb, Platform.select({ ios: 500, default: 0 }));
+    setTimeout(cb, Platform.select({
+      ios: 500, // To allow the native modal to slide away before unmounting
+      default: 0, // Android has no animation, Web has css animation which doesn't require the delay
+    }));
   };
 
   const onMinimize = () => closeModal(props.onMinimize);

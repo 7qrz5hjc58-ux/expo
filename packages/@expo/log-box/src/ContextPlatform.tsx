@@ -1,13 +1,13 @@
-import React, { createContext, useContext, ReactNode, useMemo } from 'react';
+import React, { createContext, ReactNode, useMemo, use } from 'react';
 
 interface RuntimePlatformContextType {
   platform?: string;
   isNative: boolean;
 }
 
-const RuntimePlatformContext = createContext<RuntimePlatformContextType | undefined>(undefined);
+const RuntimePlatformContextProvider = createContext<RuntimePlatformContextType | undefined>(undefined);
 
-export const RuntimePlatformProvider: React.FC<{ children: ReactNode; platform?: string }> = ({
+export const RuntimePlatformContext: React.FC<{ children: ReactNode; platform?: string }> = ({
   children,
   platform,
 }) => {
@@ -16,22 +16,22 @@ export const RuntimePlatformProvider: React.FC<{ children: ReactNode; platform?:
   }, [platform]);
 
   return (
-    <RuntimePlatformContext.Provider value={{ platform, isNative }}>
+    <RuntimePlatformContextProvider value={{ platform, isNative }}>
       {children}
-    </RuntimePlatformContext.Provider>
+    </RuntimePlatformContextProvider>
   );
 };
 
 export const withRuntimePlatform = (Component: React.FC, options: { platform: string }) => {
   return (props: any) => (
-    <RuntimePlatformProvider platform={options.platform}>
+    <RuntimePlatformContext platform={options.platform}>
       <Component {...props} />
-    </RuntimePlatformProvider>
+    </RuntimePlatformContext>
   );
 };
 
 export const useRuntimePlatform = (): RuntimePlatformContextType => {
-  const context = useContext(RuntimePlatformContext);
+  const context = use(RuntimePlatformContextProvider);
   if (context === undefined) {
     // return { platform: 'web', isNative: false };
     throw new Error('useRuntimePlatform must be used within a RuntimePlatformProvider');

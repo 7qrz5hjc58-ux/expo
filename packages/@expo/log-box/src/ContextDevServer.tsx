@@ -1,5 +1,7 @@
-import React, { useEffect, useState, createContext, useContext, ReactNode, useMemo  }  from 'react';
+import React, { useEffect, useState, createContext, use, ReactNode  }  from 'react';
 import { fetchProjectMetadataAsync } from './utils/devServerEndpoints';
+
+// Dev Server implementation https://github.com/expo/expo/blob/f29b9f3715e42dca87bf3eebf11f7e7dd1ff73c1/packages/%40expo/cli/src/start/server/metro/MetroBundlerDevServer.ts#L1145
 
 function useProjectMetadataFromServer() {
   const [meta, setMeta] = useState<DevServerContextType | null>(null);
@@ -22,26 +24,26 @@ interface DevServerContextType {
   sdkVersion: string | undefined;
 }
 
-const DevServerContext = createContext<DevServerContextType | undefined>(undefined);
+const DevServerContextProvider = createContext<DevServerContextType | undefined>(undefined);
 
-export const DevServerProvider: React.FC<{ children: ReactNode; }> = ({
+export const DevServerContext: React.FC<{ children: ReactNode; }> = ({
   children,
 }) => {
   const meta = useProjectMetadataFromServer();
 
   return (
-    <DevServerContext.Provider value={{
+    <DevServerContextProvider value={{
       projectRoot: meta?.projectRoot,
       serverRoot: meta?.serverRoot,
       sdkVersion: meta?.sdkVersion
     }}>
       {children}
-    </DevServerContext.Provider>
+    </DevServerContextProvider>
   );
 };
 
 export const useDevServer = (): DevServerContextType => {
-  const context = useContext(DevServerContext);
+  const context = use(DevServerContextProvider);
   if (context === undefined) {
     throw new Error('useDevServer must be used within a DevServerProvider');
   }

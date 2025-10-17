@@ -1,32 +1,31 @@
-import React, { createContext, useContext, ReactNode } from 'react';
+import React, { createContext, ReactNode, use } from 'react';
 
 interface ActionsContextType {
   onMinimize: (() => void) | undefined;
 }
 
-const ActionsContext = createContext<ActionsContextType>({
+const ActionsContextProvider = createContext<ActionsContextType>({
   onMinimize: () => {},
 });
 
-export const ActionsProvider: React.FC<{ children: ReactNode } & ActionsContextType> = ({
+export const ActionsContext: React.FC<{ children: ReactNode } & ActionsContextType> = ({
   children,
   onMinimize,
 }) => {
-  return <ActionsContext.Provider value={{ onMinimize }}>{children}</ActionsContext.Provider>;
+  return <ActionsContextProvider value={{ onMinimize }}>{children}</ActionsContextProvider>;
 };
 
 export const withActions = (Component: React.FC, actions: ActionsContextType) => {
   return (props: any) => (
-    <ActionsProvider {...actions}>
+    <ActionsContext {...actions}>
       <Component {...props} />
-    </ActionsProvider>
+    </ActionsContext>
   );
 };
 
 export const useActions = (): ActionsContextType => {
-  const context = useContext(ActionsContext);
+  const context = use(ActionsContextProvider);
   if (context === undefined) {
-    // return { onMinimize: undefined };
     throw new Error('useActions must be used within an ActionsProvider');
   }
   return context;

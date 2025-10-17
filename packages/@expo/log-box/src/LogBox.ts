@@ -22,9 +22,6 @@ const LogBox = {
 
     isLogBoxInstalled = true;
 
-    // Trigger lazy initialization of module.
-    // require("../NativeModules/specs/NativeLogBox");
-
     // IMPORTANT: we only overwrite `console.error` and `console.warn` once.
     // When we uninstall we keep the same reference and only change its
     // internal implementation

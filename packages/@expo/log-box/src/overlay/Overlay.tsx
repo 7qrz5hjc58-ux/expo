@@ -23,7 +23,7 @@ import { classNames } from '../utils/classNames';
 import { getFormattedStackTrace } from '../utils/devServerEndpoints';
 
 import '../Global.css';
-import { DevServerProvider, useDevServer } from '../ContextDevServer';
+import { DevServerContext, useDevServer } from '../ContextDevServer';
 
 const HEADER_TITLE_MAP: Record<LogLevel, string> = {
   error: 'Console Error',
@@ -40,9 +40,9 @@ export function LogBoxInspectorContainer() {
     return null;
   }
   return (
-    <DevServerProvider>
+    <DevServerContext>
       <LogBoxInspector log={log} selectedLogIndex={selectedLogIndex} logs={logs} />
-    </DevServerProvider>
+    </DevServerContext>
   );
 }
 
