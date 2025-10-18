@@ -328,7 +328,7 @@
 
   [self _addInitModuleObserver];
 #endif
-  if(_devLauncherViewController != nil){
+  if (_devLauncherViewController != nil) {
     [_devLauncherViewController resetHostingController];
   }
 }
